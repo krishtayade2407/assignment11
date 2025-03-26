@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Clock with Advanced Features</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* More modern font */
+            text-align: center;
+            background-color: #222;
+            color: #eee; /* Slightly softer white */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smoother transition */
+            margin: 0; /* Remove default body margin */
+            padding-top: 50px; /* Add some top padding */
+            box-sizing: border-box; /* Ensure padding doesn't affect width */
+        }
+
+        h1 {
+            color: #ddd;
+            margin-bottom: 30px;
+        }
+
+        .clock-container {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+            margin: 20px auto; /* Center the clock */
+            display: inline-block;
+        }
+
+        .clock {
+            font-size: 3.5rem; /* Slightly larger */
+            margin-bottom: 15px;
+            font-weight: bold;
+            letter-spacing: 2px; /* Improve readability */
+        }
+
+        .date {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+
+        .blinking {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .theme-switcher {
+            margin-bottom: 30px;
+        }
+
+        .theme-switcher label {
+            margin-right: 10px;
+            color: #ccc;
+        }
+
+        .theme-switcher select {
+            padding: 8px 12px;
+            border: 1px solid #555;
+            background-color: #444;
+            color: #eee;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .alarm-section,
+        .stopwatch,
+        .countdown {
+            margin: 20px;
+            padding: 25px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            background-color: #333;
+            display: inline-block;
+            width: 350px; /* Slightly wider for better layout */
+            text-align: left; /* Align content inside to the left */
+        }
+
+        .alarm-section h2,
+        .stopwatch h2,
+        .countdown h2 {
+            color: #ddd;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 10px;
+        }
+
+        .alarm-section input[type="time"],
+        .countdown input[type="number"] {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #555;
+            background-color: #444;
+            color: #eee;
+            border-radius: 5px;
+        }
+
+        .alarm-section button,
+        .stopwatch button,
+        .countdown button {
+            padding: 8px 15px;
+            background-color: #007bff; /* Primary color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .alarm-section button:hover,
+        .stopwatch button:hover,
+        .countdown button:hover {
+            background-color: #0056b3;
+        }
+
+        #alarmList {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        #alarmList li {
+            padding: 8px 0;
+            border-bottom: 1px solid #444;
+            color: #ccc;
+        }
+
+        #alarmList li:last-child {
+            border-bottom: none;
+        }
+
+        #stopwatchDisplay,
+        #countdownDisplay {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #eee;
+        }
+
+        #progressBar {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #444;
+            appearance: none; /* Remove default browser styling */
+        }
+
+        #progressBar::-webkit-progress-bar {
+            background-color: #444;
+            border-radius: 5px;
+        }
+
+        #progressBar::-webkit-progress-value {
+            background-color: #007bff;
+            border-radius: 5px;
+        }
+
+        #progressBar::-moz-progress-bar {
+            background-color: #007bff;
+            border-radius: 5px;
+        }
+
+        .neon {
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff; /* Stronger neon effect */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Digital Clock with Alarm & Advanced Features</h1>
+    <div class="clock-container">
+        <div class="clock">
+            <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds" class="blinking">00</span> <span id="ampm">AM</span>
+        </div>
+        <div class="date" id="currentDate"></div>
+    </div>
+
+    <div class="theme-switcher">
+        <label for="theme">Theme:</label>
+        <select id="theme">
+            <option value="light">Light</option>
+            <option value="dark" selected>Dark</option>
+            <option value="neon">Neon</option>
+        </select>
+    </div>
+
+    <div class="alarm-section">
+        <h2>Set Alarm</h2>
+        <input type="time" id="alarmTime">
+        <button onclick="setAlarm()">Set Alarm</button>
+        <ul id="alarmList"></ul>
+    </div>
+
+    <div class="stopwatch">
+        <h2>Stopwatch</h2>
+        <div id="stopwatchDisplay">00:00:00</div>
+        <button onclick="startStopwatch()">Start</button>
+        <button onclick="pauseStopwatch()">Pause</button>
+        <button onclick="resetStopwatch()">Reset</button>
+    </div>
+
+    <div class="countdown">
+        <h2>Countdown Timer</h2>
+        <input type="number" id="countdownInput" placeholder="Enter minutes">
+        <button onclick="startCountdown()">Start</button>
+        <div id="countdownDisplay">00:00</div>
+        <progress id="progressBar" value="0" max="100"></progress>
+    </div>
+
+    <script>
+        // Digital Clock Functionality
+        function updateClock() {
+            let now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+            let ampm = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12;
+            document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+            document.getElementById("ampm").innerText = ampm;
+            document.getElementById("currentDate").innerText = now.toDateString();
+        }
+        setInterval(updateClock, 1000);
+
+        // Theme Switcher
+        document.getElementById("theme").addEventListener("change", function() {
+            let theme = this.value;
+            document.body.classList.remove("light", "dark", "neon"); // Remove existing classes
+            document.querySelector(".clock").classList.remove("neon"); // Remove neon class from clock
+
+            if (theme === "light") {
+                document.body.classList.add("light");
+                document.body.style.backgroundColor = "#f9f9f9";
+                document.body.style.color = "#333";
+            } else if (theme === "dark") {
+                document.body.classList.add("dark");
+                document.body.style.backgroundColor = "#222";
+                document.body.style.color = "#eee";
+            } else if (theme === "neon") {
+                document.body.classList.add("neon");
+                document.body.style.backgroundColor = "#000";
+                document.body.style.color = "#0ff";
+                document.querySelector(".clock").classList.add("neon");
+            }
+        });
+
+        // Initialize with the default theme (dark)
+        document.dispatchEvent(new Event('change'));
+
+        // Alarm System
+        let alarms = [];
+        function setAlarm() {
+            let alarmTime = document.getElementById("alarmTime").value;
+            if (alarmTime) {
+                alarms.push(alarmTime);
+                document.getElementById("alarmList").innerHTML += `<li>${alarmTime}</li>`;
+                alert("Alarm set for " + alarmTime);
+            }
+        }
+        setInterval(() => {
+            let now = new Date();
+            let currentTime = now.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
+            if (alarms.includes(currentTime)) {
+                alert("Alarm ringing!");
+            }
+        }, 1000);
+
+        // Stopwatch
+        let stopwatchTime = 0, stopwatchInterval;
+        function updateStopwatch() {
+            let hrs = Math.floor(stopwatchTime / 3600);
+            let mins = Math.floor((stopwatchTime % 3600) / 60);
+            let secs = stopwatchTime % 60;
+            document.getElementById("stopwatchDisplay").innerText =
+                `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        function startStopwatch() {
+            if (!stopwatchInterval) {
+                stopwatchInterval = setInterval(() => {
+                    stopwatchTime++;
+                    updateStopwatch();
+                }, 1000);
+            }
+        }
+        function pauseStopwatch() {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+        }
+        function resetStopwatch() {
+            stopwatchTime = 0;
+            updateStopwatch();
+        }
+
+        // Countdown Timer
+        let countdownInterval;
+        function startCountdown() {
+            let minutes = parseInt(document.getElementById("countdownInput").value);
+            if (isNaN(minutes) || minutes <= 0) return;
+            let secondsLeft = minutes * 60;
+            const totalSeconds = minutes * 60; // Store total seconds for progress bar
+            document.getElementById("progressBar").max = totalSeconds; // Set max for progress bar
+
+            countdownInterval = setInterval(() => {
+                secondsLeft--;
+                let mins = Math.floor(secondsLeft / 60);
+                let secs = secondsLeft % 60;
+                document.getElementById("countdownDisplay").innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                document.getElementById("progressBar").value = totalSeconds - secondsLeft; // Update progress
+
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    alert("Time's up!");
+                    document.getElementById("progressBar").value = 0; // Reset progress bar
+                }
+            }, 1000);
+        }
+    </script>
+
+</body>
+</html>
